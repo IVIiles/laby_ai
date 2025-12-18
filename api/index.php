@@ -1,22 +1,23 @@
 <?php
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
 
-// Lecture du fichier maze.txt
 $mazeFile = __DIR__ . '/../maze.txt';
-$mazeData = [];
 
 if (file_exists($mazeFile)) {
-    $lines = file($mazeFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        $mazeData[] = str_split($line);
-    }
+    $content = file_get_contents($mazeFile);
+    // Nettoyage des retours à la ligne Windows/Unix
+    $lines = explode("\n", str_replace("\r", "", trim($content)));
+    $mazeData = array_map('str_split', $lines);
+    
+    echo json_encode([
+        "status" => "success",
+        "maze" => $mazeData
+    ]);
 } else {
-    // Labyrinthe par défaut si le fichier est manquant
-    $mazeData = [["A", "1", "0"], ["0", "1", "0"], ["0", "0", "G"]];
+    echo json_encode([
+        "status" => "error",
+        "message" => "Fichier maze.txt introuvable",
+        "path" => $mazeFile
+    ]);
 }
-
-// Pour l'instant, on renvoie juste la structure du labyrinthe
-echo json_encode([
-    "status" => "success",
-    "maze" => $mazeData
-]);
