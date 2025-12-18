@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze AI - Vercel Edition</title>
+    <style>
+        :root {
+            --wall-color: #2c3e50;
+            --path-color: #ecf0f1;
+            --agent-color: #e74c3c;
+            --goal-color: #2ecc71;
+        }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f4f4f9; }
+        #maze-container { 
+            display: grid; 
+            gap: 2px; 
+            background: #bdc3c7; 
+            padding: 5px; 
+            border-radius: 5px; 
+            margin-top: 20px;
+        }
+        .cell { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .wall { background-color: var(--wall-color); }
+        .path { background-color: var(--path-color); }
+        .agent { background-color: var(--agent-color); border-radius: 50%; color: white; }
+        .goal { background-color: var(--goal-color); color: white; }
+        button { margin-top: 20px; padding: 10px 20px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Labyrinthe IA (PHP + JS)</h1>
+    <div id="maze-container"></div>
+    <button onclick="loadMaze()">Charger / Reset</button>
+
+    <script>
+        async function loadMaze() {
+            try {
+                const response = await fetch('/api/index');
+                const data = await response.json();
+                renderMaze(data.maze);
+            } catch (error) {
+                console.error("Erreur lors du chargement:", error);
+            }
+        }
+
+        function renderMaze(maze) {
+            const container = document.getElementById('maze-container');
+            container.innerHTML = '';
+            container.style.gridTemplateColumns = `repeat(${maze[0].length}, 40px)`;
+
+            maze.forEach((row, y) => {
+                row.forEach((cell, x) => {
+                    const div = document.createElement('div');
+                    div.className = 'cell';
+                    if (cell === '1') div.classList.add('wall');
+                    else if (cell === '0') div.classList.add('path');
+                    else if (cell === 'A') div.classList.add('agent'), div.innerText = 'A';
+                    else if (cell === 'G') div.classList.add('goal'), div.innerText = 'G';
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // Chargement initial
+        loadMaze();
+    </script>
+</body>
+</html>
